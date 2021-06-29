@@ -1,0 +1,7 @@
+**/.DS_Store
+Cargo.lock
+/target/*
+!/target/release
+/target/release/*
+!/target/release/mk_rusty_tube
+!/target/release/mk_rusty_tube.exe
