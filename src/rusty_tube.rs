@@ -266,8 +266,8 @@ mod tests {
         if cfg!(target_os = "macos") {
             assert_eq!(output_path, PathBuf::from("/Users/mushogenshin/Movies"));
         } else if cfg!(target_os = "windows") {
+            assert_eq!(output_path, PathBuf::from(r"C:\Users\USER\Videos"));
             println!("{:?}", output_path);
-            // assert_eq!(output_path, PathBuf::from(r"C:\Users"));
         }
     }
 }
