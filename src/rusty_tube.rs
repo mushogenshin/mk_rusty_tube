@@ -8,7 +8,7 @@ use std::path::PathBuf;
 use std::process::Command;
 
 #[derive(Default)]
-pub struct SimpleYouTubeDL {
+pub struct RustyTubeDL {
     url: String,
     url_input: text_input::State,
     audio_only: bool,
@@ -26,7 +26,7 @@ pub enum Message {
     ProcessOutputTextChanged(String),
 }
 
-impl Sandbox for SimpleYouTubeDL {
+impl Sandbox for RustyTubeDL {
     type Message = Message;
 
     fn new() -> Self {
@@ -69,7 +69,7 @@ impl Sandbox for SimpleYouTubeDL {
                     .push(
                         TextInput::new(
                             &mut self.debug_line_input,
-                            "Download status",
+                            "Status: ",
                             &self.debug_line,
                             Message::ProcessOutputTextChanged,
                         )
@@ -95,34 +95,34 @@ impl Sandbox for SimpleYouTubeDL {
         match event {
             Message::ToggleAudioOnly(toggle) => self.audio_only = toggle,
             Message::URLInputTextChanged(new_value) => {
-                self.debug_line = String::from(""); // clear
+                self.debug_line = String::from("Status: Not started");
                 self.url = new_value;
             }
             Message::URLInputReturnPressed => {
                 let status = self.download();
                 if status.success() {
-                    self.debug_line = String::from("Completed");
+                    self.debug_line = String::from("Status: Completed.");
                 } else {
-                    self.debug_line = String::from("(!)Failed");
+                    self.debug_line = String::from("Status: (!)Failed");
                 }
             }
             Message::ShowResultsPressed => {
-                SimpleYouTubeDL::show_results(SimpleYouTubeDL::get_download_folder_path());
+                RustyTubeDL::show_results(RustyTubeDL::get_download_folder_path());
             }
             Message::ProcessOutputTextChanged(new_value) => self.debug_line = new_value,
         }
     }
 }
 
-impl SimpleYouTubeDL {
+impl RustyTubeDL {
     fn download(&self) -> std::process::ExitStatus {
         let child: std::process::Output;
         let re1 = Regex::new(r".*playlist\?list=.*").unwrap();
-        let output_path = SimpleYouTubeDL::get_download_folder_path();
+        let output_path = RustyTubeDL::get_download_folder_path();
         if re1.is_match(&self.url) {
-            child = SimpleYouTubeDL::download_playlist(&self.url, self.audio_only, output_path);
+            child = RustyTubeDL::download_playlist(&self.url, self.audio_only, output_path);
         } else {
-            child = SimpleYouTubeDL::download_single_video(&self.url, self.audio_only, output_path);
+            child = RustyTubeDL::download_single_video(&self.url, self.audio_only, output_path);
         };
         child.status
     }
@@ -160,7 +160,7 @@ impl SimpleYouTubeDL {
     fn get_download_folder_path() -> PathBuf {
         // TODO: add options for the drives on which to save downloaded file to
         let path: &str = if cfg!(target_os = "windows") {
-            "$USERPROFILE/Videos"
+            r"$USERPROFILE\Videos"
         } else if cfg!(target_os = "macos") {
             "$HOME/Movies"
         } else {
@@ -191,10 +191,17 @@ impl SimpleYouTubeDL {
     }
 }
 
-// #[cfg(test)]
-// mod tests {
-//     #[test]
-//     fn target_os() {
-//         // assert_eq!(1, 0);
-//     }
-// }
+#[cfg(test)]
+mod tests {
+    use std::path::PathBuf;
+    #[test]
+    fn shell_expand() {
+        let output_path = crate::RustyTubeDL::get_download_folder_path();
+        if cfg!(target_os = "macos") {
+            assert_eq!(output_path, PathBuf::from("/Users/mushogenshin/Movies"));
+        } else if cfg!(target_os = "windows") {
+            println!("{:?}", output_path);
+            // assert_eq!(output_path, PathBuf::from(r"C:\Users"));
+        }
+    }
+}

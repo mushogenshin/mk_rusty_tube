@@ -1,9 +1,10 @@
-mod simple_youtube_dl;
+mod rusty_tube;
 use iced::{settings, window, Sandbox};
-use simple_youtube_dl::SimpleYouTubeDL;
+use rusty_tube::RustyTubeDL;
 
 fn main() -> iced::Result {
     let window_settings = window::Settings {
+        size: (600, 130),
         max_size: Some((600, 130)),
         ..window::Settings::default()
     };
@@ -11,5 +12,5 @@ fn main() -> iced::Result {
         window: window_settings,
         ..settings::Settings::default()
     };
-    SimpleYouTubeDL::run(app_settings)
+    RustyTubeDL::run(app_settings)
 }
