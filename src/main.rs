@@ -4,8 +4,7 @@ use rusty_tube::RustyTubeDL;
 
 fn main() -> iced::Result {
     let window_settings = window::Settings {
-        size: (600, 130),
-        max_size: Some((600, 130)),
+        size: (600, 170),
         ..window::Settings::default()
     };
     let app_settings = settings::Settings {
